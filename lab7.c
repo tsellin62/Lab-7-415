@@ -15,6 +15,12 @@ void *worker(void *arg)
     /* TODO: Lock the mutex before updating counter. */
     /* TODO: Increment counter by 1. */
     /* TODO: Unlock the mutex after updating counter. */
+	for (int i = 0; i < increments_per_thread; i++) {
+		pthread_mutex_lock(&mutex);
+		counter++;
+		pthread_mutex_unlock(&mutex);
+	}
+	pthread_exit(NULL);
 
     return NULL;
 }
@@ -44,14 +50,26 @@ int main(int argc, char *argv[])
     }
 
     /* TODO: Initialize the mutex (pthread_mutex_init). */
+	pthread_mutex_init(&mutex, NULL);
 
     /* TODO: Create num_threads threads, each running worker. */
+	int numbers[num_threads];
+	for (int i = 0; i < num_threads; i++) {
+		numbers[i] = i;
+	}
+	for (int i = 0; i < num_threads; i++) {
+		pthread_create(&threads[i], NULL, worker, (void*)&numbers[i]);
+	}
 
     /* TODO: Join all threads. */
+	for (int i = 0; i < num_threads; i++) {
+		pthread_join(threads[i], NULL);
+	}
 
     printf("Final counter value: %d\n", counter);
 
     /* TODO: Destroy the mutex (pthread_mutex_destroy). */
+	pthread_mutex_destroy(&mutex);
 
     free(threads);
     return 0;
